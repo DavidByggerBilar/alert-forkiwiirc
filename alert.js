@@ -56,6 +56,7 @@ function MessageHandler() {
                     continue;
                 }
             } else {
+                /*
                 console.error("Caution! One or more values are null!");
                 if (messagestring[channelcounter] == null) {
                     console.error("messagestring is null");
@@ -66,6 +67,7 @@ function MessageHandler() {
                 if (messagelength[channelcounter] == null) {
                     console.error("messagelength is null");
                 }
+                    */
             }
 
         }
@@ -79,11 +81,13 @@ function GrabMessage(channel) {
     //console.time('grabmsg');
     //console.log("grabmessage");
     //console.warn("BEFBEF!!, LENGTH:" + messagelength[channelcounter]); // using warn instead of log to not spam the log
-    messagelength[channelcounter] = InjectLengthScript(channel);
-    //setTimeout(console.warn("AFTAFT!!, LENGTH:" + messagelength[channelcounter]), 800); // using warn instead of log to not spam the log
-    //console.warn("AFTAFT!!, LENGTH:" + messagelength[channelcounter])
-    messagestring[channelcounter] = InjectMessageScript(channel, messagelength[channelcounter]);
-    messagetime[channelcounter] = InjectTimeScript(channel, messagelength[channelcounter]);
+    if (messagelength[channelcounter] !== null && messagelength[channelcounter] !== undefined) { // if its not null
+        messagelength[channelcounter] = InjectLengthScript(channel);
+        //setTimeout(console.warn("AFTAFT!!, LENGTH:" + messagelength[channelcounter]), 800); // using warn instead of log to not spam the log
+        //console.warn("AFTAFT!!, LENGTH:" + messagelength[channelcounter])
+        messagestring[channelcounter] = InjectMessageScript(channel, messagelength[channelcounter]);
+        messagetime[channelcounter] = InjectTimeScript(channel, messagelength[channelcounter]);
+    }
     //console.timeEnd('grabmsg');
     return;
 }
@@ -105,7 +109,7 @@ function GrabMessage2(lengthsec, channel) {
 function CheckForNull(Channelcounter) {
     // Returns 0 if one of the arrays are null
     if (((messagelength[Channelcounter] || messagestring[Channelcounter]) == null) || ((messagetime[Channelcounter]) == 0)) {
-        console.error("One or more values are null!");
+        //console.error("One or more values are null!");
         return 0;
     }
     if ((messagelength[Channelcounter] != null && messagestring[Channelcounter]) != null && (messagetime[Channelcounter] != 0)) {
@@ -158,6 +162,12 @@ function GrabChannels() {
 function GrabChannels() {
     let availNetworks = [];
     let networkElement = document.querySelectorAll(".kiwi-statebrowser-network-header");
+
+    if (!networkElement) {
+        console.warn("No network elements found.");
+        return availNetworks;
+    }
+
     for (networkElement of networkElement) {
         let elements = networkElement.parentNode.querySelectorAll("*");
         let networkName = extractNetworkName(networkElement.innerText.split(" "));
@@ -166,6 +176,7 @@ function GrabChannels() {
         for (let element of elements) {
             if (element.className !== "kiwi-statebrowser-buffers") continue;
             let text = element.innerText;
+            if (!text) continue; // Skip empty elements
             let words = text.split("\n");
             //if (!availNetworks[networkName]) {
             //    availNetworks[networkName] = [];
@@ -182,6 +193,7 @@ function GrabChannels() {
             }
         }
         availNetworks.push({ network: networkName, channels: networkChannels});
+
     }
     return availNetworks;
 }

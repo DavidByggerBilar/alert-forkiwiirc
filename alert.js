@@ -81,13 +81,11 @@ function GrabMessage(channel) {
     //console.time('grabmsg');
     //console.log("grabmessage");
     //console.warn("BEFBEF!!, LENGTH:" + messagelength[channelcounter]); // using warn instead of log to not spam the log
-    if (messagelength[channelcounter] !== null && messagelength[channelcounter] !== undefined) { // if its not null
-        messagelength[channelcounter] = InjectLengthScript(channel);
-        //setTimeout(console.warn("AFTAFT!!, LENGTH:" + messagelength[channelcounter]), 800); // using warn instead of log to not spam the log
-        //console.warn("AFTAFT!!, LENGTH:" + messagelength[channelcounter])
-        messagestring[channelcounter] = InjectMessageScript(channel, messagelength[channelcounter]);
-        messagetime[channelcounter] = InjectTimeScript(channel, messagelength[channelcounter]);
-    }
+    messagelength[channelcounter] = InjectLengthScript(channel);
+    //setTimeout(console.warn("AFTAFT!!, LENGTH:" + messagelength[channelcounter]), 800); // using warn instead of log to not spam the log
+    //console.warn("AFTAFT!!, LENGTH:" + messagelength[channelcounter])
+    messagestring[channelcounter] = InjectMessageScript(channel, messagelength[channelcounter]);
+    messagetime[channelcounter] = InjectTimeScript(channel, messagelength[channelcounter]);
     //console.timeEnd('grabmsg');
     return;
 }
@@ -117,48 +115,6 @@ function CheckForNull(Channelcounter) {
         return 1;
     }
 }
-/*
-function GrabChannels() {
-    // Gets the currently active channels and places them into the activechannels array
-    //console.log("grabchannels");
-    let element = document.querySelectorAll(".kiwi-statebrowser-network-header *");
-    //let element=document.getElementsByClassName("kiwi-statebrowser kiwi-theme-bg");
-    let text = "";
-    let words = "";
-    let networkName = "";
-    // empties the array so that a bunch of same data doesn't flood the array.
-    for (let elementnumber = 0; elementnumber < element.length; elementnumber++) {
-        text = element[elementnumber].innerText;
-        words = text.split(" ");
-        let networkName = extractNetworkName(words);
-         // Initialize network in networks object if it doesn't exist.
-        if (!networks[networkName]) {
-            networks[networkName] = [];
-        }
-        networks[networkName].length = 0;
-        for (let wordnumber = 0; wordnumber < words.length; wordnumber++) {
-            //console.log("wordslength: " + words.length);
-            if (words[wordnumber].startsWith("#")) {
-                if (words[wordnumber].endsWith("a") || words[wordnumber].endsWith("b") || words[wordnumber].endsWith("c") || words[wordnumber].endsWith("d") || words[wordnumber].endsWith("e") || words[wordnumber].endsWith("f") || words[wordnumber].endsWith("g") || words[wordnumber].endsWith("h") || words[wordnumber].endsWith("i") || words[wordnumber].endsWith("j") || words[wordnumber].endsWith("k") || words[wordnumber].endsWith("l") || words[wordnumber].endsWith("m") || words[wordnumber].endsWith("n") || words[wordnumber].endsWith("o") || words[wordnumber].endsWith("p") || words[wordnumber].endsWith("q") || words[wordnumber].endsWith("r") || words[wordnumber].endsWith("s") || words[wordnumber].endsWith("t") || words[wordnumber].endsWith("u") || words[wordnumber].endsWith("v") || words[wordnumber].endsWith("w") || words[wordnumber].endsWith("x") || words[wordnumber].endsWith("y") || words[wordnumber].endsWith("z") || words[wordnumber].endsWith("0") || words[wordnumber].endsWith("1") || words[wordnumber].endsWith("2") || words[wordnumber].endsWith("3") || words[wordnumber].endsWith("4") || words[wordnumber].endsWith("5") || words[wordnumber].endsWith("6") || words[wordnumber].endsWith("7") || words[wordnumber].endsWith("8") || words[wordnumber].endsWith("9")) {
-                    //activechannels.length = activechannels.length++;
-                    //activechannels.push(words[wordnumber]);
-                    networks[networkName].push(words[wordnumber]);
-                    continue;
-
-                }
-            }
-        }
-    }
-
-    if (networks[networkName].length == 0) {
-        console.warn("no channels found");
-        return 0;
-    } else {
-        //console.warn("active channels: " + activechannels);
-        return 1;
-    }
-}
-*/
 function GrabChannels() {
     let availNetworks = [];
     let networkElement = document.querySelectorAll(".kiwi-statebrowser-network-header");
@@ -167,14 +123,19 @@ function GrabChannels() {
         console.warn("No network elements found.");
         return availNetworks;
     }
+    
 
     for (networkElement of networkElement) {
+        if (networkElement.parentNode.innerText.includes("Not connected.")) {
+            continue; // Skip networks that are not connected
+        }
+
         let elements = networkElement.parentNode.querySelectorAll("*");
         let networkName = extractNetworkName(networkElement.innerText.split(" "));
         let networkChannels = [];
 
         for (let element of elements) {
-            if (element.className !== "kiwi-statebrowser-buffers") continue;
+            //if (element.className !== "kiwi-statebrowser-buffers") continue;
             let text = element.innerText;
             if (!text) continue; // Skip empty elements
             let words = text.split("\n");
@@ -324,7 +285,7 @@ function CheckMessage() {
             return 1;
         }
     }
-    
+        /*
         if (messagestring[channelcounter].includes("the rat king has arrived")) {
             if ((messagetime[channelcounter] > lasttime[channelcounter]) || (lasttime[channelcounter] == null)) {
                 lasttime[channelcounter] = messagetime[channelcounter];
@@ -333,7 +294,6 @@ function CheckMessage() {
                 return 1;
             }
         }
-        /*
         if (messagestring[channelcounter].includes("the")) {
             if ((messagetime[channelcounter] > lasttime[channelcounter]) || (lasttime[channelcounter] == null)) {
                 lasttime[channelcounter] = messagetime[channelcounter];
